@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Progetto: SCM
+-->
+<project name="SCM" default="Build-DEV" basedir=".">
+	<!--
+		Inizializzazione variabili
+	-->
+	<!-- Leggo le proprietà del progetto dal file -->
+	<property file="build.properties" />
+	<property file="local.properties" />
+
+	<!-- Preparo cartelle java e jboss -->
+	<property name="java.dir.bin" location="${local.java.home}/bin" />
+	<property name="java.dir.bin.jdk.6" location="${local.java.home.jdk.6}/bin" />
+	<property name="local.dir.bin" location="//bin" />
+	<property name="jboss.home" value="${local.jboss.home}" />
+	<property name="jboss.dir.bin" value="${jboss.home}/bin" />
+	<property name="jboss.dir.deploy" value="${jboss.home}/standalone/deployments" />
+
+	<!-- Peparo cartelle sorgenti -->
+	<property name="lib.dir" location="${basedir}/java/resource/lib" />
+	<property name="srcFrontend.dir" location="${basedir}/java/src_frontend" />
+	<property name="srcBackend.dir" location="${basedir}/java/src_backend" />
+	<property name="srcGeneric.dir" location="${basedir}/java/src_generic" />
+	<property name="srcGenerated.dir" location="${basedir}/java/src_generated" />
+	<property name="web.dir" location="${basedir}/java/web" />
+	<property name="resource.dir" location="${basedir}/java/resource" />
+	<property name="ejb.descriptor" location="${basedir}/java/resource/EarContent/META-INF/application.xml" />
+	<property name="deployment.structure" location="${resource.dir}/EarContent/META-INF/jboss-deployment-structure.xml" />
+
+	<!-- Preparo cartelle compilazione -->
+	<property name="build.dir" location="${basedir}/java/build" />
+	<property name="build.release.dir" location="${basedir}/java/build/release" />
+	<property name="build.classes.dir" location="${build.dir}/classes" />
+	<property name="build.classesWeb.dir" location="${build.dir}/classesWeb" />
+	<property name="build.classesBackend.dir" location="${build.dir}/classesBackend" />	
+	<property name="build.classesGeneric.dir" location="${build.dir}/classesGeneric" />
+	
+	<!-- Preparo cartelle findBugs -->
+	<property name="findbugs.home.dir" location="${basedir}/findbugs" />
+	<property name="findbugs.output.dir" location="${basedir}/findbugs" />
+	<property name="findbugs.classpath" value="${findbugs.home.dir}/lib/findbugs-ant.jar" />
+	
+	<!-- Preparo i classpath di compilazione e di esecuzione -->
+	<path id="project.class.path">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	
+	
+	<path id="generatescript.class.path">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathelement path="${local.dir.bin}" />
+	</path>
+	
+
+	<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpath="${findbugs.classpath}" />
+	
+	<!--
+		Tasks PRINCIPALI
+	-->
+	<!-- Compilazione applicazione per ambiente di sviluppo -->
+	<target name="Build-DEV" depends="Step-AfterCompileForDEV, Step-Install" />
+
+	<!-- Compilazione applicazione per ambiente di rilascio -->
+	<target name="Build-RELEASE" depends="Step-RemoveCompilationDirs, Step-AfterCompileForRELEASE, Step-Install" />
+	
+	<!-- Esegue i test case che permettono il testing automatico dell'applicazione -->
+	<target name="Execute-Test" depends="Step-Install, Step-Test" />
+
+	<!-- 
+		Step TASKS
+	-->
+	<!-- Delete compilation dirs -->
+	<target name="Step-RemoveCompilationDirs">
+		<delete dir="${build.dir}" quiet="true" />
+	</target>
+	
+	<!-- Inizializzo lo script di compilazione prima della compilazione -->
+	<target name="Step-Init">
+		<echo>Build and deploy script</echo>
+		<echo>Jboss DIR: ${jboss.home}</echo>
+		<echo>Java DIR: ${java.dir.bin}</echo>
+		<echo>Lib DIR: ${lib.dir}</echo>		
+		<echo>===========================</echo>
+		<echo />
+
+		<!-- Recreate class and build dir -->
+		<delete dir="${build.dir}" quiet="true" />
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.classesBackend.dir}" />
+		<mkdir dir="${build.classesGeneric.dir}" />
+		<mkdir dir="${build.classesWeb.dir}" />
+		<mkdir dir="${build.release.dir}" />
+		<mkdir dir="${build.classes.dir}" />
+		
+	</target>
+	
+	<target name="Step-Compile">
+		<delete dir="${srcGenerated.dir}" />
+		<mkdir dir="${srcGenerated.dir}" />
+	</target>
+
+	<!-- Compilo i sorgenti -->
+	<target name="Step-CompileSources" depends="Step-Init,Step-Compile">
+		
+		<!-- Compile generic  -->
+		<echo>Building generic</echo>
+		<javac destdir="${build.classesGeneric.dir}" failonerror="true" debug="${local.java.debug}" optimize="true" encoding="ISO8859_15" fork="true" executable="${java.dir.bin}/javac" includeantruntime="false">
+			<src>
+				<pathelement path="${srcGeneric.dir}" />
+			</src>
+			<classpath refid="project.class.path" />
+		</javac>
+		
+		<!-- Compile backend -->
+		<echo>Building backend</echo>
+		<javac destdir="${build.classesBackend.dir}" failonerror="true" debug="${local.java.debug}" optimize="true" encoding="ISO8859_15" fork="true" executable="${java.dir.bin}/javac" includeantruntime="false"> <!-- classpath="${build.classesGeneric.dir}" pezzo tolto alla fine -->
+			<src>
+				<pathelement path="${srcBackend.dir}" />
+			</src> 
+			<src>
+				<pathelement path="${srcGenerated.dir}" />
+			</src>
+			
+			<classpath refid="project.class.path" />
+			<classpath path="${build.classesGeneric.dir}"/>
+		</javac>
+		<!-- Compile frontend -->
+		<echo>Building web</echo>
+		<javac destdir="${build.classesWeb.dir}" failonerror="true" debug="${local.java.debug}" optimize="true" encoding="ISO8859_15" fork="true" executable="${java.dir.bin}/javac" classpath="${build.classesBackend.dir}" includeantruntime="false">
+			<src>
+				<pathelement path="${srcFrontend.dir}" />
+			</src>
+			<src>
+				<pathelement path="${srcGenerated.dir}" />
+			</src>
+			<classpath refid="project.class.path" />
+			<classpath path="${build.classesGeneric.dir}"/>
+		</javac>	
+		
+		<!-- Copio i file aggiuntivi (xml, properties, xsd, txt) nelle directory di build -->
+		<echo>Coping addittion files</echo>
+		<copy todir="${build.classesBackend.dir}" overwrite="true">
+			<fileset dir="${srcBackend.dir}">
+				<include name="**/*.properties" />
+				<include name="**/*.xml" />
+				<include name="**/*.xsd" />
+				<include name="**/*.xsl" />
+			</fileset> 
+		</copy> 
+		<copy todir="${build.classesWeb.dir}" overwrite="true">
+			<fileset dir="${srcFrontend.dir}">
+				<include name="**/*.properties" />
+				<include name="**/*.xml" />
+			</fileset>
+		</copy>
+		<copy todir="${build.classesGeneric.dir}" overwrite="true">
+			<fileset dir="${srcGeneric.dir}">
+				<include name="**/*.properties" />
+				<include name="**/*.xml" />
+				<include name="**/*.xsl" />
+				<include name="**/*.xslt" />
+				<include name="**/*.xsd" />
+			</fileset>
+		</copy>	
+		<!-- Copy all classes into main classes dir -->
+		<copy todir="${build.classes.dir}" overwrite="true">
+			<fileset dir="${build.classesWeb.dir}" />
+			<fileset dir="${build.classesBackend.dir}" />
+			<fileset dir="${build.classesGeneric.dir}" />
+		</copy>
+			
+	</target>
+		
+	<!-- Operazioni da eseguire dopo compilazione per sviluppo -->
+	<!--Step-CompileSources, Step-GenerateScript-->
+	<target name="Step-AfterCompileForDEV" depends="Step-GenerateScript,Step-CompileSources">
+		<property name="build.version" value="in sviluppo" />
+	</target>
+
+	<!-- Operazioni da eseguire dopo compilazione per rilascio in produzione -->
+	<target name="Step-AfterCompileForRELEASE" depends="Step-GenerateScript,Step-CompileSources">
+		<property name="build.version" value="${release.version}_b${release.build}" />
+	</target>
+	
+	<target name="Step-GenerateScript">
+		<java fork="yes" classname="com.gpi.scm.utils.CreateSequenceScript">
+		    <arg value="${basedir}" />
+			<arg value="ScmExcludeSeq" />
+			<arg value="ScmModel" />
+			<classpath refid="generatescript.class.path" />
+		</java>
+		<java classname="com.gpi.scm.utils.InstallationScriptVerificator">
+			<arg value="${basedir}" />
+			<arg value="ScmModel" />
+			<classpath refid="generatescript.class.path" />
+		</java>
+	</target>
+	
+	
+	<!-- Creo il file esegubile (EAR o WAR per i progetti WEB e JAR per i progetti swing) -->
+	<target name="Step-CreateExecutable" depends="Step-CompileSources">
+	    <tstamp>
+			<format property="timenow" pattern="yyyyMMddHHmm" locale="it,IT" />
+		</tstamp>
+		
+		<!-- Create JAR -->
+		<jar destfile="${build.dir}/${jar.name}">
+			<zipfileset dir="${build.classesBackend.dir}"/>
+			<zipfileset dir="${build.classesGeneric.dir}"/>
+
+			<zipfileset dir="${basedir}/java/resource/remote/META-INF" prefix="META-INF">
+				<include name="persistence.xml" />
+			</zipfileset>
+			
+			<manifest>
+				<attribute name="Specification-Vendor" value="GPI Group s.p.a" />
+				<attribute name="Specification-Version" value="${build.version}" />
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Built-Date" value="${timenow}" />
+				<!-- <attribute name="Dependencies" value="org.apache.commons.pool org.apache.xerces" /> -->
+			</manifest>
+		</jar>
+		<echo>JAR created: ${build.dir}/${jar.name}</echo>
+
+		<!-- Create JAR Client -->
+		<jar destfile="${build.release.dir}/${jar.client.name}">
+			<zipfileset dir="${build.classesGeneric.dir}">
+				<include name="**/*"/>
+			</zipfileset>
+			<zipfileset dir="${build.classesBackend.dir}">
+				<include name="**/*"/>
+			</zipfileset>
+					
+			<manifest>
+				<attribute name="Specification-Vendor" value="GPI Group s.p.a" />
+				<attribute name="Specification-Version" value="${build.version}" />
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Built-Date" value="${timenow}" />
+				<!-- <attribute name="Dependencies" value="org.apache.commons.pool org.apache.xerces" /> -->
+			</manifest>
+		</jar>
+		<echo>JAR created: ${build.dir}/${jar.client.name}</echo>
+		
+		<!-- Create WAR -->
+		<war destfile="${build.dir}/${war.name}" webxml="${web.dir}/WEB-INF/web.xml">
+			<fileset dir="${web.dir}" />
+			
+			<!-- Classes -->
+			<classes dir="${build.classesWeb.dir}" />
+
+			<!-- Adding library -->
+
+			<manifest>
+				<attribute name="Specification-Vendor" value="GPI Group s.p.a" />
+				<attribute name="Specification-Version" value="${build.version}" />
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Built-Date" value="${timenow}" />
+				<!-- <attribute name="Dependencies" value="org.jboss.netty org.apache.xerces" /> -->
+			</manifest>
+		</war>
+		<echo>WAR created: ${build.dir}/${war.name}</echo>
+		
+		<!-- Create EAR -->
+		<ear destfile="${build.release.dir}/${ear.name}" appxml="${ejb.descriptor}" >
+			<fileset dir="${build.dir}" includes="*.jar,*.war" />
+			
+			<zipfileset dir="${lib.dir}/jwt" includes="*.jar" prefix="lib"/> 
+			<zipfileset dir="${lib.dir}/utils" includes="*.jar" prefix="lib"/> 
+
+			<manifest>
+				<attribute name="Specification-Vendor" value="GPI Group s.p.a" />
+				<attribute name="Specification-Version" value="${build.version}" />
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Built-Date" value="${timenow}" />
+				<!-- <attribute name="Dependencies" value="org.jboss.netty org.apache.xerces" /> -->
+			</manifest>
+		</ear>
+		<echo>EAR created: ${build.release.dir}/${ear.name}</echo>
+		
+	</target>
+
+	<!-- Installo l'eseguibile all'interno dell'application server NB: Target necessario solo per applicazioni web -->
+	<target name="Step-Install" depends="Step-CreateExecutable">
+		<copy todir="${jboss.dir.deploy}">
+			<fileset file="${build.release.dir}/${ear.name}" />
+			<mapper type="flatten" />
+		</copy>
+	</target>
+
+	<!-- Esegue i test-case che permettono il controllo automatico del funzionamento dell'applicazione -->
+	<target name="Step-Test" depends="Step-CreateExecutable">
+	</target>
+		
+	<target name="Step-FindBugs" depends="Step-CompileSources">
+		<findbugs home="${findbugs.home.dir}" warningsProperty="findbugs.failed"
+				  output="html" outputFile="${findbugs.output.dir}/findbugs.html"
+				  reportLevel="high" failOnError="true" quietErrors="true"
+				  timeout="5400000" omitVisitors="FindSqlInjection"
+				  jvmargs="-Xms128m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=256m">
+			<class location="${build.classes.dir}" />
+		</findbugs>
+	</target>
+</project>

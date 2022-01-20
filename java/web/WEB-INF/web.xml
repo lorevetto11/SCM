@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+    <display-name>SCM</display-name>
+    
+	<!-- Session Configuration -->
+	<session-config>
+        <session-timeout>15</session-timeout>
+	</session-config>    
+	
+    <!-- Map welcome page page (default page)  -->
+	<!--
+    <welcome-file-list>
+        <welcome-file>faces/index.xhtml</welcome-file>
+    </welcome-file-list>
+	
+	-->
+	
+    <!-- Use faces servlet -->
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+		<init-param>
+            <param-name>production</param-name>
+            <param-value>true</param-value>
+        </init-param>        
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+		
+	
+	<listener>
+	  <listener-class>com.gpi.scm.listeners.Log4jConfigListener</listener-class>
+	</listener>
+	
+	<!-- Log4j Initialization Parameters -->
+	<context-param>
+	  <!-- absolute path to log4j config file (*.properties or *.xml) -->
+		<param-name>logging.LOG4J_CONFIG_FILE</param-name>
+		<param-value>log4j.xml</param-value>
+	</context-param>
+	<context-param>
+	  <!-- number of milliseconds to wait before checking LOG4J_CONFIG_LOCATION for updates -->
+	  <param-name>logging.LOG4J_REFRESH_INTERVAL</param-name>
+	  <param-value>20000</param-value>
+	</context-param>	
+	<context-param>
+	  <!-- IP Address to force DEBUG level -->
+	  <param-name>logging.LOG4J_DEBUG_IP</param-name>
+	  <param-value>127.0.0.1</param-value>
+	</context-param>    
+	<context-param>
+	  <!-- Default Date pattern -->
+	  <param-name>layout.DEFAULT_DATE_PATTERN</param-name>
+	  <param-value>dd/MM/yyyy</param-value>
+	</context-param>
+	<context-param>
+	  <!-- Default Time pattern -->
+	  <param-name>layout.DEFAULT_TIME_PATTERN</param-name>
+	  <param-value>HH:mm:ss</param-value>
+	</context-param> 
+	<context-param>
+	  <!-- Default DateTime pattern -->
+	  <param-name>layout.DEFAULT_DATETIME_PATTERN</param-name>
+	  <param-value>dd/MM/yyyy HH:mm:ss</param-value>
+	</context-param>
+	<context-param>
+	  <!-- Default DateTime short pattern -->
+	  <param-name>layout.DEFAULT_DATETIME_SHORT_PATTERN</param-name>
+	  <param-value>dd/MM/yyyy HH:mm</param-value>
+	</context-param>
+</web-app>

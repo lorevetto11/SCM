@@ -1,0 +1,2 @@
+Copiare in WILDFLY_HOME/standalone/configuration/gpi
+questa cartella privacymanagment e configurare il file di properties.

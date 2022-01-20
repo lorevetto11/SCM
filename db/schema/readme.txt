@@ -1,0 +1,11 @@
+Seguire le seguenti istruzioni per l'installazione del prodotto SCM
+
+  [SCM]_01_INSTALL.sql 
+  [SCM]_02_INSTALL_SEQUENCE.sql
+  [SCM]_03_INSTALL_DEFAULT_COLUMN.sql 
+  [SCM]_04_INSTALL_FUNCTIONS_TRIGGERS.sql 
+  [SCM]_05A_INSTALL_VIEWS.sql  
+  [SCM]_06_INSERT_DEFAULT_VALUE.sql 
+  [SCM]_07_INSTALL_ADDITIONAL_TABLES_INDEXES.sql
+
+

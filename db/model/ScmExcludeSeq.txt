@@ -1,0 +1,6 @@
+-- Generato da Oracle SQL Developer Data Modeler 4.0.2.840
+--   in:        2018-02-21 14:59:21 CET
+--   sito:      Oracle Database 11g
+--   tipo:      Oracle Database 11g
+
+

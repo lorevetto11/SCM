@@ -1,0 +1,16 @@
+# ==============================
+# Local part Property file
+# ==============================
+
+# Local environment properties
+#
+
+
+local.jboss.home=/tmp/
+local.java.home=/usr/bin/java
+
+#jdk usata per compilare solo il client con la 1.6
+local.java.home.jdk.6=/usr/bin/java
+
+local.java.debug=true
+#local.monitoring.root=D:/projects/workspace_luna/IE-Monitoring_WIP

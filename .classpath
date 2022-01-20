@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="java/src_backend"/>
+	<classpathentry kind="src" path="java/src_frontend"/>
+	<classpathentry kind="src" path="java/src_generic"/>
+	<classpathentry kind="lib" path="java/resource/lib/resteasy/resteasy-jaxrs-3.0.14.Final.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/resteasy/resteasy-multipart-provider-3.0.14.Final.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/jwt/gson-2.2.4.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/jwt/jose4j-0.4.4.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/jwt/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/jwt/json.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/log/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/hibernate/hibernate-annotations.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/hibernate/hibernate-jpa-2.1-api-1.0.0.Final.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="java/resource/lib/javaee/javaee-api-7.0.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/jwt/validation-api-2.0.1.Final.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/hibernate/hibernate-core-5.0.12.Final.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/utils/commons-lang3-3.7.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/utils/commons-beanutils-1.9.3.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/utils/commons-collections-3.2.2.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/utils/emailaddress-rfc2822-1.0.1.jar"/>
+	<classpathentry kind="lib" path="java/resource/lib/utils/simple-java-mail-5.0.3.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

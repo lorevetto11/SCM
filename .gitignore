@@ -1,0 +1,5 @@
+/bin/
+/java/build
+./local.properties
+/db/postgres/tools/PostgresSQLConverter
+/local.properties
